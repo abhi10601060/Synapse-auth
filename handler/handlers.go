@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"synapse/auth/authjwt"
 	"synapse/auth/db"
 	"synapse/auth/model"
 
@@ -36,16 +37,28 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	res := db.AddUser(&user)
-
-	if res == -1 {
-		c.JSON(400, gin.H{
-			"message": "Internal Server Error",
+	jwt_token, err := authjwt.CreateJwtToken(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Internal server error",
 		})
 		c.Abort()
 		return
 	}
 
+	res := db.AddUser(&user)
+	if res == -1 {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Internal Server Error",
+		})
+		c.Abort()
+		return
+	}
+	
+	c.JSON(200, gin.H{
+		"message": "Welcome to Synapse",
+		"token":   jwt_token,
+	})
 }
 
 func Login(c *gin.Context) {
@@ -61,13 +74,27 @@ func Login(c *gin.Context) {
 	}
 	log.Println("received user is : ", user)
 
-	if !db.IsValidPassword(&user){
+	if !db.IsValidPassword(&user) {
 		c.JSON(201, gin.H{
-			"message" : "Incorrect Credentials",
+			"message": "Incorrect Credentials",
 		})
 		c.Abort()
 		return
 	}
 
-	
+	jwt_token, err := authjwt.CreateJwtToken(&user)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Internal server error",
+		})
+		c.Abort()
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Welcome to Synapse",
+		"token":   jwt_token,
+	})
+
 }
