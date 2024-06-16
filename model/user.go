@@ -2,6 +2,6 @@ package model
 
 
 type User struct{
-	Id string `json:"id" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Id string `json:"id" binding:"required" gorm:"primarykey"`
+	Password string `json:"password" binding:"required" gorm:"not null"`
 }

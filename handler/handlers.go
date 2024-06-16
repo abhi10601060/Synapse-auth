@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"synapse/auth/db"
 	"synapse/auth/model"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,7 @@ func SignUp(c *gin.Context) {
 		c.Abort()
 	}
 	log.Println("received user is : ", user)
+	db.AddUser(&user)
 }
 
 func Login(c *gin.Context) {
