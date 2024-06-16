@@ -53,7 +53,7 @@ func AddUser(user *model.User) int {
 func UserExist(user *model.User) bool {
 	var res int64
 
-	err := auth_db.Model(&model.User{}).Where("user_name = ?", user.Id).Count(&res).Error
+	err := auth_db.Model(&model.User{}).Where("id = ?", user.Id).Count(&res).Error
 	if err != nil {
 		log.Println("err during user Exists : ", err.Error())
 		return false
@@ -61,7 +61,7 @@ func UserExist(user *model.User) bool {
 	return res > 0
 }
 
-func isValidPassword(incominUser *model.User) bool {
+func IsValidPassword(incominUser *model.User) bool {
 	var userFromDB model.User = model.User{Id: incominUser.Id}
 	err := auth_db.First(&userFromDB).Error
 
